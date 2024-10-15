@@ -11,6 +11,7 @@ function sendError(res, message) {
 }
 
 exports.postNew = async (req, res) => {
+  if (!req.body) { res.end(); }
   if (!('email' in req.body)) { sendError(res, 'Missing email'); }
   if (!('password' in req.body)) { sendError(res, 'Missing password'); }
 
