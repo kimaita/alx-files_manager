@@ -1,19 +1,12 @@
+import { ObjectId } from 'mongodb';
 import dbClient from '../utils/db';
-
-const crypto = require('crypto');
-
-function hashPassword(password) {
-  return crypto.createHash('sha1').update(password).digest('hex');
-}
-
-function sendError(res, message) {
-  return res.status(400).json({ error: message });
-}
+import redisClient from '../utils/redis';
+import { hashPassword, sendError } from '../utils/utils';
 
 exports.postNew = async (req, res) => {
   if (!req.body) { sendError(res, 'Missing email'); }
-  if (!('email' in req.body)) { sendError(res, 'Missing email'); }
-  if (!('password' in req.body)) { sendError(res, 'Missing password'); }
+  if (!('email' in req.body)) { sendError(res, 400, 'Missing email'); }
+  if (!('password' in req.body)) { sendError(res, 400, 'Missing password'); }
 
   const user = {
     email: req.body.email,
@@ -24,6 +17,16 @@ exports.postNew = async (req, res) => {
     const id = await dbClient.addUser(user);
     res.status(201).json({ id, email: user.email });
   } catch (error) {
-    sendError(res, error.message);
+    sendError(res, 400, error.message);
   }
+};
+
+exports.getMe = async (req, res) => {
+  const token = req.header('X-Token');
+  if (!token) { sendError(res, 401, 'Unauthorized'); }
+  const userID = await redisClient.get(`auth_${token}`);
+  if (!userID) { sendError(res, 401, 'Unauthorized'); }
+
+  const user = await dbClient.getUser({ _id: new ObjectId(userID) });
+  res.json({ id: user._id, email: user.email });
 };
