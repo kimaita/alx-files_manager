@@ -1,8 +1,7 @@
+import { v4 as uuidv4 } from 'uuid';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 import { hashPassword, sendError } from '../utils/utils';
-
-const { uuid } = require('uuidv4');
 
 exports.getConnect = async (req, res) => {
   const authHeader = req.header('Authorization');
@@ -18,7 +17,7 @@ exports.getConnect = async (req, res) => {
     sendError(res, 401, 'Unauthorized');
   }
 
-  const token = uuid();
+  const token = uuidv4();
   const redisKey = `auth_${token}`;
   await redisClient.set(redisKey, user._id.toString(), 24 * 60 * 60);
 
