@@ -5,6 +5,7 @@ const port = process.env.PORT || 5000;
 
 const indexRouter = require('./routes/index');
 
+app.use(express.json());
 app.use('/', indexRouter);
 
 app.listen(port, () => {
