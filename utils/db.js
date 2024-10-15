@@ -36,6 +36,17 @@ class DBClient {
   async nbFiles() {
     return this.files.countDocuments();
   }
+
+  async addUser(user) {
+    const exists = await this.users.findOne({ email: user.email });
+    if (exists) {
+      throw new Error('Already exist');
+    }
+
+    const result = await this.users.insertOne(user);
+
+    return result.insertedId;
+  }
 }
 
 const dbClient = new DBClient();
