@@ -37,8 +37,13 @@ class DBClient {
     return this.files.countDocuments();
   }
 
+  async getUser(args) {
+    console.log('Searching', args);
+    return this.users.findOne(args);
+  }
+
   async addUser(user) {
-    const exists = await this.users.findOne({ email: user.email });
+    const exists = await this.getUser(user.email);
     if (exists) {
       throw new Error('Already exist');
     }
