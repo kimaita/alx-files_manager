@@ -38,19 +38,26 @@ class DBClient {
   }
 
   async getUser(args) {
-    console.log('Searching', args);
     return this.users.findOne(args);
   }
 
   async addUser(user) {
-    const exists = await this.getUser(user.email);
+    const exists = await this.getUser({ email: user.email });
     if (exists) {
       throw new Error('Already exist');
     }
 
-    const result = await this.users.insertOne(user);
+    const insertedUser = await this.users.insertOne(user);
+    return insertedUser.insertedId;
+  }
 
-    return result.insertedId;
+  async getFile(args) {
+    return this.files.findOne(args);
+  }
+
+  async addFile(file) {
+    const insertedFile = await this.files.insertOne(file);
+    return insertedFile.insertedId;
   }
 }
 
