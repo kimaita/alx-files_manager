@@ -16,4 +16,5 @@ export default async function getSessionUser(token) {
   if (!user) {
     throw new Error('Unauthorized');
   }
+  return user;
 }
