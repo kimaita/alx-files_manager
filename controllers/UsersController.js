@@ -1,6 +1,6 @@
 import dbClient from '../utils/db';
 import { hashPassword, sendError } from '../utils/utils';
-import { getSessionUser } from '../utils/auth';
+import getSessionUser from '../utils/auth';
 
 exports.postNew = async (req, res) => {
   if (!req.body) { sendError(res, 'Missing email'); }

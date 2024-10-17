@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 import { hashPassword, sendError } from '../utils/utils';
-import { getSessionUser } from '../utils/auth';
+import getSessionUser from '../utils/auth';
 
 exports.getConnect = async (req, res) => {
   const authHeader = req.header('Authorization');
