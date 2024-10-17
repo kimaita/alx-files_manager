@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 import { hashPassword, sendError } from '../utils/utils';
+import { getSessionUser } from '../utils/auth';
 
 exports.getConnect = async (req, res) => {
   const authHeader = req.header('Authorization');
@@ -26,11 +27,14 @@ exports.getConnect = async (req, res) => {
 
 exports.getDisconnect = async (req, res) => {
   const token = req.header('X-Token');
-  if (!token) { sendError(res, 401, 'Unauthorized'); }
   const key = `auth_${token}`;
 
-  const userID = await redisClient.get(key);
-  if (!userID) { sendError(res, 401, 'Unauthorized'); }
+  try {
+    getSessionUser(token);
+  } catch (error) {
+    sendError(res, 401, error.message);
+  }
+
   await redisClient.delete(key);
   res.status(204).end();
 };

@@ -1,7 +1,6 @@
-import { ObjectId } from 'mongodb';
 import dbClient from '../utils/db';
-import redisClient from '../utils/redis';
 import { hashPassword, sendError } from '../utils/utils';
+import { getSessionUser } from '../utils/auth';
 
 exports.postNew = async (req, res) => {
   if (!req.body) { sendError(res, 'Missing email'); }
@@ -22,11 +21,10 @@ exports.postNew = async (req, res) => {
 };
 
 exports.getMe = async (req, res) => {
-  const token = req.header('X-Token');
-  if (!token) { sendError(res, 401, 'Unauthorized'); }
-  const userID = await redisClient.get(`auth_${token}`);
-  if (!userID) { sendError(res, 401, 'Unauthorized'); }
-
-  const user = await dbClient.getUser({ _id: new ObjectId(userID) });
-  res.json({ id: user._id, email: user.email });
+  try {
+    const user = getSessionUser(req.header('X-Token'));
+    res.json({ id: user._id, email: user.email });
+  } catch (error) {
+    sendError(res, 401, error.message);
+  }
 };
