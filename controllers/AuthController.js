@@ -29,11 +29,9 @@ exports.getDisconnect = async (req, res) => {
   const token = req.header('X-Token');
   const key = `auth_${token}`;
 
-  try {
-    getSessionUser(token);
-  } catch (error) {
+  getSessionUser(token).catch((error) => {
     sendError(res, 401, error.message);
-  }
+  });
 
   await redisClient.delete(key);
   res.status(204).end();

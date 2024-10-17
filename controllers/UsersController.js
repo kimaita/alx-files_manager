@@ -12,19 +12,17 @@ exports.postNew = async (req, res) => {
     password: hashPassword(req.body.password),
   };
 
-  try {
-    const id = await dbClient.addUser(user);
+  dbClient.addUser(user).then((id) => {
     res.status(201).json({ id, email: user.email });
-  } catch (error) {
+  }).catch((error) => {
     sendError(res, 400, error.message);
-  }
+  });
 };
 
 exports.getMe = async (req, res) => {
-  try {
-    const user = getSessionUser(req.header('X-Token'));
+  getSessionUser(req.header('X-Token')).then((user) => {
     res.json({ id: user._id, email: user.email });
-  } catch (error) {
+  }).catch((error) => {
     sendError(res, 401, error.message);
-  }
+  });
 };
