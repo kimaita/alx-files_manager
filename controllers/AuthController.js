@@ -22,7 +22,7 @@ exports.getConnect = async (req, res) => {
 
   const token = uuidv4();
   const redisKey = `auth_${token}`;
-  await redisClient.set(redisKey, user._id.toString(), 24 * 60 * 60);
+  redisClient.set(redisKey, user._id.toString(), 24 * 60 * 60);
 
   res.json({ token });
 };
@@ -31,10 +31,10 @@ exports.getDisconnect = async (req, res) => {
   const token = req.header('X-Token');
   const key = `auth_${token}`;
 
-  getSessionUser(token).catch((error) => {
+  getSessionUser(token).then(() => {
+    redisClient.delete(key);
+    res.status(204).end();
+  }).catch((error) => {
     sendError(res, 401, error.message);
   });
-
-  await redisClient.delete(key);
-  res.status(204).end();
 };
