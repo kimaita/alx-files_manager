@@ -3,9 +3,14 @@ import { hashPassword, sendError } from '../utils/utils';
 import getSessionUser from '../utils/auth';
 
 exports.postNew = async (req, res) => {
-  if (!req.body) { sendError(res, 'Missing email'); }
-  if (!('email' in req.body)) { sendError(res, 400, 'Missing email'); }
-  if (!('password' in req.body)) { sendError(res, 400, 'Missing password'); }
+  if (!('email' in req.body)) {
+    sendError(res, 400, 'Missing email');
+    return;
+  }
+  if (!('password' in req.body)) {
+    sendError(res, 400, 'Missing password');
+    return;
+  }
 
   const user = {
     email: req.body.email,

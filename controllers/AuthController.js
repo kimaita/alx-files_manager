@@ -8,6 +8,7 @@ exports.getConnect = async (req, res) => {
   const authHeader = req.header('Authorization');
   if (!authHeader) {
     sendError(res, 401, 'Unauthorized');
+    return;
   }
 
   const decoded = Buffer.from(authHeader.split(' ')[1], 'base64').toString();
@@ -16,6 +17,7 @@ exports.getConnect = async (req, res) => {
   const user = await dbClient.getUser({ email });
   if (!user || hashPassword(pwd) !== user.password) {
     sendError(res, 401, 'Unauthorized');
+    return;
   }
 
   const token = uuidv4();
